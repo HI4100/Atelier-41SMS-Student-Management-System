@@ -2,6 +2,7 @@
 
 import re
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,7 @@ class StudentManager:
         return connection
 
     def _initialize_database(self) -> None:
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             connection.execute(
                 """CREATE TABLE IF NOT EXISTS students (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +55,7 @@ class StudentManager:
                     course: str = "", semester: int = 1) -> int:
         values = self._validate_student(roll_number, full_name, email, course, semester)
         try:
-            with self._connect() as connection:
+            with closing(self._connect()) as connection, connection:
                 cursor = connection.execute(
                     "INSERT INTO students (roll_number, full_name, email, course, semester) VALUES (?, ?, ?, ?, ?)",
                     values,
@@ -64,14 +65,14 @@ class StudentManager:
             raise ValueError("Roll number or email already exists.") from exc
 
     def list_students(self) -> list[dict[str, Any]]:
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             rows = connection.execute(
                 "SELECT id, roll_number, full_name, email, course, semester, created_at FROM students ORDER BY roll_number COLLATE NOCASE"
             ).fetchall()
             return [dict(row) for row in rows]
 
     def get_student(self, student_id: int) -> dict[str, Any] | None:
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             row = connection.execute("SELECT * FROM students WHERE id = ?", (student_id,)).fetchone()
             return dict(row) if row else None
 
@@ -79,7 +80,7 @@ class StudentManager:
                        email: str = "", course: str = "", semester: int = 1) -> bool:
         values = self._validate_student(roll_number, full_name, email, course, semester)
         try:
-            with self._connect() as connection:
+            with closing(self._connect()) as connection, connection:
                 cursor = connection.execute(
                     "UPDATE students SET roll_number=?, full_name=?, email=?, course=?, semester=? WHERE id=?",
                     (*values, student_id),
@@ -89,7 +90,7 @@ class StudentManager:
             raise ValueError("Roll number or email already exists.") from exc
 
     def delete_student(self, student_id: int) -> bool:
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             cursor = connection.execute("DELETE FROM students WHERE id = ?", (student_id,))
             return cursor.rowcount > 0
 
@@ -98,7 +99,7 @@ class StudentManager:
         if not keyword:
             raise ValueError("Search keyword cannot be empty.")
         pattern = f"%{keyword}%"
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             rows = connection.execute(
                 """SELECT * FROM students WHERE roll_number LIKE ? COLLATE NOCASE
                    OR full_name LIKE ? COLLATE NOCASE OR email LIKE ? COLLATE NOCASE
@@ -108,12 +109,12 @@ class StudentManager:
             return [dict(row) for row in rows]
 
     def course_summary(self) -> list[dict[str, Any]]:
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             rows = connection.execute(
                 "SELECT course, COUNT(*) AS student_count FROM students GROUP BY course ORDER BY course COLLATE NOCASE"
             ).fetchall()
             return [dict(row) for row in rows]
 
     def total_students(self) -> int:
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             return int(connection.execute("SELECT COUNT(*) FROM students").fetchone()[0])
