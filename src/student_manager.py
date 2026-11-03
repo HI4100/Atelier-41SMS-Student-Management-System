@@ -44,7 +44,7 @@ class StudentManager:
         course = course.strip()
         if not roll_number or not full_name or not course:
             raise ValueError("Roll number, full name, and course are required.")
-        if email and not re.fullmatch(r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email):
+        if email and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
             raise ValueError("Enter a valid email address.")
         if isinstance(semester, bool) or not isinstance(semester, int) or not 1 <= semester <= 8:
             raise ValueError("Semester must be a whole number from 1 to 8.")
