@@ -1,4 +1,4 @@
-# Student Management System
+# ATELIER 41 | Student Management System
 
 A Python command-line application for maintaining student records with an SQLite database. The project demonstrates CRUD operations, relational database fundamentals, input validation, SQL queries, and automated unit testing.
 
@@ -90,3 +90,14 @@ SQL statements use parameterized queries. The application is intended as an educ
 ## License
 
 No license has been added yet. All rights reserved by default.
+
+
+---
+
+## ✨ ATELIER 41 Signature
+
+> **Build it clearly. Test it carefully. Document it honestly. Improve it continuously.**
+
+This project is part of my **ATELIER 41** portfolio — a connected collection of practical projects built and documented by **Humza Warsi**.
+
+🔗 GitHub: [@HI4100](https://github.com/HI4100) • ✨ **ATELIER 41**
